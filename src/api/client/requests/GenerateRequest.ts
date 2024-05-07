@@ -6,9 +6,7 @@ import * as FileForge from "../../index";
 
 /**
  * @example
- *     {
- *         options: {}
- *     }
+ *     {}
  */
 export interface GenerateRequest {
     options: FileForge.GenerateRequestOptions;

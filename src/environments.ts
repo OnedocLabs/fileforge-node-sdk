@@ -3,7 +3,7 @@
  */
 
 export const FileForgeEnvironment = {
-    Default: "https://30c1-2a01-cb00-286-f500-f58d-848f-e524-f098.ngrok-free.app",
+    Default: "https://api.fileforge.com",
 } as const;
 
 export type FileForgeEnvironment = typeof FileForgeEnvironment.Default;

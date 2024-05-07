@@ -10,11 +10,17 @@ export const GenerateRequestOptions: core.serialization.ObjectSchema<
     serializers.GenerateRequestOptions.Raw,
     FileForge.GenerateRequestOptions
 > = core.serialization.object({
-    world: core.serialization.string().optional(),
+    test: core.serialization.boolean().optional(),
+    host: core.serialization.boolean().optional(),
+    expiresAt: core.serialization.date().optional(),
+    fileName: core.serialization.string().optional(),
 });
 
 export declare namespace GenerateRequestOptions {
     interface Raw {
-        world?: string | null;
+        test?: boolean | null;
+        host?: boolean | null;
+        expiresAt?: string | null;
+        fileName?: string | null;
     }
 }
