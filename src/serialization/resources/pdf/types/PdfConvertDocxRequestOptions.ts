@@ -6,14 +6,14 @@ import * as serializers from "../../../index";
 import * as FileForge from "../../../../api/index";
 import * as core from "../../../../core";
 
-export const PostPdfDocxRequestOptions: core.serialization.ObjectSchema<
-    serializers.PostPdfDocxRequestOptions.Raw,
-    FileForge.PostPdfDocxRequestOptions
+export const PdfConvertDocxRequestOptions: core.serialization.ObjectSchema<
+    serializers.PdfConvertDocxRequestOptions.Raw,
+    FileForge.PdfConvertDocxRequestOptions
 > = core.serialization.object({
     templateLiterals: core.serialization.record(core.serialization.string(), core.serialization.string()).optional(),
 });
 
-export declare namespace PostPdfDocxRequestOptions {
+export declare namespace PdfConvertDocxRequestOptions {
     interface Raw {
         templateLiterals?: Record<string, string> | null;
     }

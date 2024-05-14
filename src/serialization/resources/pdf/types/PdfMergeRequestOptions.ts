@@ -6,11 +6,11 @@ import * as serializers from "../../../index";
 import * as FileForge from "../../../../api/index";
 import * as core from "../../../../core";
 
-export const PostPdfMergeRequestOptions: core.serialization.ObjectSchema<
-    serializers.PostPdfMergeRequestOptions.Raw,
-    FileForge.PostPdfMergeRequestOptions
+export const PdfMergeRequestOptions: core.serialization.ObjectSchema<
+    serializers.PdfMergeRequestOptions.Raw,
+    FileForge.PdfMergeRequestOptions
 > = core.serialization.object({});
 
-export declare namespace PostPdfMergeRequestOptions {
+export declare namespace PdfMergeRequestOptions {
     interface Raw {}
 }

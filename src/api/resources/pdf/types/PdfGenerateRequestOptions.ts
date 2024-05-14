@@ -5,7 +5,7 @@
 /**
  * Conversion options. This field is required even if empty.
  */
-export interface GenerateRequestOptions {
+export interface PdfGenerateRequestOptions {
     /** Generate a test document instead of a production document. The generated document will contain a watermark. Defaults to true. */
     test?: boolean;
     /** If enabled, the document will be hosted by FileForge and a presigned URL will be returned. */

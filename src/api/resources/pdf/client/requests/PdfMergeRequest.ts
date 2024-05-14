@@ -8,6 +8,6 @@ import * as FileForge from "../../../../index";
  * @example
  *     {}
  */
-export interface PostPdfMergeRequest {
-    options: FileForge.PostPdfMergeRequestOptions;
+export interface PdfMergeRequest {
+    options: FileForge.PdfMergeRequestOptions;
 }

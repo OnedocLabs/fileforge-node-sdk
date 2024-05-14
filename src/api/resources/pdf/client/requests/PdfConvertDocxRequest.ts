@@ -8,7 +8,7 @@ import * as FileForge from "../../../../index";
  * @example
  *     {}
  */
-export interface PostPdfDocxRequest {
+export interface PdfConvertDocxRequest {
     /**
      * Conversion options. This field is required even if empty.
      *
@@ -34,5 +34,5 @@ export interface PostPdfDocxRequest {
      *
      * There will not be an error if a variable is not found in the document, nor if variables found in the document are not in the options.
      */
-    options: FileForge.PostPdfDocxRequestOptions;
+    options: FileForge.PdfConvertDocxRequestOptions;
 }
