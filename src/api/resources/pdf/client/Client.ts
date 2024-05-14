@@ -7,7 +7,6 @@ import * as core from "../../../../core";
 import * as fs from "fs";
 import * as FileForge from "../../../index";
 import * as stream from "stream";
-import { default as FormData } from "form-data";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 import * as serializers from "../../../../serialization/index";
@@ -30,6 +29,107 @@ export class Pdf {
     constructor(protected readonly _options: Pdf.Options) {}
 
     /**
+     * Converts a Microsoft Word document (.DOCX or .DOC) file to a PDF document.
+     *
+     * This service uses a LibreOffice headless server to perform the conversion, and may not support all features of the original document.
+     *
+     * **Known discrepancies**
+     *
+     * - Some fonts may not be available in the server, and may be substituted by a closest match.
+     * - Some complex formatting may not be preserved, such as background graphics.
+     *
+     * **Variables**
+     *
+     * Variable replacement is supported with various methods:
+     *
+     * - Templated litterals: `{{name}}`
+     * - Word variables, as listed in the document metadata: `{DOCVARIABLE "name"}`
+     *
+     * To enable variable replacement as Word variables for your account, please contact the FileForge support.
+     * @throws {@link FileForge.BadRequestError}
+     * @throws {@link FileForge.UnauthorizedError}
+     * @throws {@link FileForge.InternalServerError}
+     */
+    public async convertsADocOrDocxDocumentToPdf(
+        file: File | fs.ReadStream,
+        request: FileForge.PostPdfDocxRequest,
+        requestOptions?: Pdf.RequestOptions
+    ): Promise<stream.Readable> {
+        const _request = new core.FormDataWrapper();
+        await _request.append("options", JSON.stringify(request.options));
+        await _request.append("file", file);
+        const _maybeEncodedRequest = _request.getRequest();
+        const _response = await core.fetcher<stream.Readable>({
+            url: urlJoin(
+                (await core.Supplier.get(this._options.environment)) ?? environments.FileForgeEnvironment.Default,
+                "pdf/docx/"
+            ),
+            method: "POST",
+            headers: {
+                Authorization: await this._getAuthorizationHeader(),
+                "X-API-Key": await core.Supplier.get(this._options.apiKey),
+                "X-Fern-Language": "JavaScript",
+                "X-Fern-SDK-Name": "fileforge",
+                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...(await _maybeEncodedRequest.getHeaders()),
+            },
+            body: await _maybeEncodedRequest.getBody(),
+            responseType: "streaming",
+            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+            maxRetries: requestOptions?.maxRetries,
+        });
+        if (_response.ok) {
+            return _response.body;
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new FileForge.BadRequestError(
+                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
+                            unrecognizedObjectKeys: "passthrough",
+                            allowUnrecognizedUnionMembers: true,
+                            allowUnrecognizedEnumValues: true,
+                            breadcrumbsPrefix: ["response"],
+                        })
+                    );
+                case 401:
+                    throw new FileForge.UnauthorizedError(
+                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
+                            unrecognizedObjectKeys: "passthrough",
+                            allowUnrecognizedUnionMembers: true,
+                            allowUnrecognizedEnumValues: true,
+                            breadcrumbsPrefix: ["response"],
+                        })
+                    );
+                case 500:
+                    throw new FileForge.InternalServerError(_response.error.body);
+                default:
+                    throw new errors.FileForgeError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                    });
+            }
+        }
+
+        switch (_response.error.reason) {
+            case "non-json":
+                throw new errors.FileForgeError({
+                    statusCode: _response.error.statusCode,
+                    body: _response.error.rawBody,
+                });
+            case "timeout":
+                throw new errors.FileForgeTimeoutError();
+            case "unknown":
+                throw new errors.FileForgeError({
+                    message: _response.error.errorMessage,
+                });
+        }
+    }
+
+    /**
      * @throws {@link FileForge.BadRequestError}
      * @throws {@link FileForge.UnauthorizedError}
      * @throws {@link FileForge.InternalServerError}
@@ -39,12 +139,13 @@ export class Pdf {
         request: FileForge.PostPdfMergeRequest,
         requestOptions?: Pdf.RequestOptions
     ): Promise<stream.Readable> {
-        const _request = new FormData();
-        _request.append("options", JSON.stringify(request.options));
+        const _request = new core.FormDataWrapper();
+        await _request.append("options", JSON.stringify(request.options));
         for (const _file of files) {
-            _request.append("files", _file);
+            await _request.append("files", _file);
         }
 
+        const _maybeEncodedRequest = _request.getRequest();
         const _response = await core.fetcher<stream.Readable>({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.FileForgeEnvironment.Default,
@@ -59,9 +160,9 @@ export class Pdf {
                 "X-Fern-SDK-Version": "0.0.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...(await _maybeEncodedRequest.getHeaders()),
             },
-            contentType: "multipart/form-data; boundary=" + _request.getBoundary(),
-            body: _request,
+            body: await _maybeEncodedRequest.getBody(),
             responseType: "streaming",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,

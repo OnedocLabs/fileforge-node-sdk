@@ -10,6 +10,6 @@ export interface ErrorSchema {
     statusCode: number;
     /** A machine-readable error code */
     code: string;
-    /** A human-readable message */
+    /** A human-readable message. This field may also provide additional context to the error code. */
     message: string;
 }

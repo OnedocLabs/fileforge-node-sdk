@@ -9,5 +9,6 @@ import * as FileForge from "../../index";
  *     {}
  */
 export interface GenerateRequest {
+    /** Conversion options. This field is required even if empty. */
     options: FileForge.GenerateRequestOptions;
 }

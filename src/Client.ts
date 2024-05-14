@@ -7,7 +7,6 @@ import * as core from "./core";
 import * as fs from "fs";
 import * as FileForge from "./api/index";
 import * as stream from "stream";
-import { default as FormData } from "form-data";
 import urlJoin from "url-join";
 import * as errors from "./errors/index";
 import * as serializers from "./serialization/index";
@@ -31,6 +30,7 @@ export class FileForgeClient {
     constructor(protected readonly _options: FileForgeClient.Options) {}
 
     /**
+     * Generates a PDF document from web assets.
      * @throws {@link FileForge.BadRequestError}
      * @throws {@link FileForge.UnauthorizedError}
      * @throws {@link FileForge.InternalServerError}
@@ -41,12 +41,13 @@ export class FileForgeClient {
         request: FileForge.GenerateRequest,
         requestOptions?: FileForgeClient.RequestOptions
     ): Promise<stream.Readable> {
-        const _request = new FormData();
-        _request.append("options", JSON.stringify(request.options));
+        const _request = new core.FormDataWrapper();
+        await _request.append("options", JSON.stringify(request.options));
         for (const _file of files) {
-            _request.append("files", _file);
+            await _request.append("files", _file);
         }
 
+        const _maybeEncodedRequest = _request.getRequest();
         const _response = await core.fetcher<stream.Readable>({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.FileForgeEnvironment.Default,
@@ -61,9 +62,9 @@ export class FileForgeClient {
                 "X-Fern-SDK-Version": "0.0.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...(await _maybeEncodedRequest.getHeaders()),
             },
-            contentType: "multipart/form-data; boundary=" + _request.getBoundary(),
-            body: _request,
+            body: await _maybeEncodedRequest.getBody(),
             responseType: "streaming",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
