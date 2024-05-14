@@ -42,7 +42,7 @@ export class FileForgeClient {
         requestOptions?: FileForgeClient.RequestOptions
     ): Promise<stream.Readable> {
         const _request = new core.FormDataWrapper();
-        await _request.append("options", JSON.stringify(request.options));
+        await _request.append("options", JSON.stringify(request.options), { contentType: "application/json"});
         for (const _file of files) {
             await _request.append("files", _file);
         }
