@@ -27,7 +27,7 @@
  *
  * There will not be an error if a variable is not found in the document, nor if variables found in the document are not in the options.
  */
-export interface PdfConvertDocxRequestOptions {
+export interface ConvertDocxRequestOptions {
     /** Map of template literals to replace in the document. */
     templateLiterals?: Record<string, string>;
 }
