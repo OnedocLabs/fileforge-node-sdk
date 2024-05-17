@@ -2,4 +2,7 @@
 
 src/Client.ts
 src/core/form-data-utils/FormDataWrapper.ts
+src/core/form-data-utils/index.ts
+src/core/index.ts
 README.md
+package.json

@@ -10,13 +10,10 @@ import * as stream from "stream";
 import urlJoin from "url-join";
 import * as errors from "./errors/index";
 import * as serializers from "./serialization/index";
-import { Pdf } from "./api/resources/pdf/client/Client";
 
 export declare namespace FileForgeClient {
     interface Options {
         environment?: core.Supplier<environments.FileForgeEnvironment | string>;
-        username: core.Supplier<string>;
-        password: core.Supplier<string>;
         apiKey: core.Supplier<string>;
     }
 
@@ -55,7 +52,6 @@ export class FileForgeClient {
             ),
             method: "POST",
             headers: {
-                Authorization: await this._getAuthorizationHeader(),
                 "X-API-Key": await core.Supplier.get(this._options.apiKey),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "fileforge",
@@ -125,18 +121,5 @@ export class FileForgeClient {
                     message: _response.error.errorMessage,
                 });
         }
-    }
-
-    protected _pdf: Pdf | undefined;
-
-    public get pdf(): Pdf {
-        return (this._pdf ??= new Pdf(this._options));
-    }
-
-    protected async _getAuthorizationHeader(): Promise<string | undefined> {
-        return core.BasicAuth.toAuthorizationHeader({
-            username: await core.Supplier.get(this._options.username),
-            password: await core.Supplier.get(this._options.password),
-        });
     }
 }
