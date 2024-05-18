@@ -19,26 +19,24 @@ yarn add fileforge
 ## Usage
 
 ```typescript
-import { FileForgeClient, FileForge } from 'guesty';
+import { FileForgeClient, FileForge } from "guesty";
 import * as fs from "fs";
 
 const fileforge = new FileForgeClient({
-  apiKey: "...", 
+    apiKey: "...",
 });
 
 await fileforge.generate({
-    files: [
-        fs.readStream("index.html"),
-    ],
+    files: [fs.readStream("index.html")],
     options: {
-        fileName: "output.pdf"
-    }
+        fileName: "output.pdf",
+    },
 });
 ```
 
 ## Exception Handling
 
-When the API returns a non-success status code (4xx or 5xx response), 
+When the API returns a non-success status code (4xx or 5xx response),
 a subclass of [FileForgeError](./src/errors/FileForgeError.ts) will be thrown:
 
 ```ts
@@ -48,9 +46,9 @@ try {
   await fileforge.generate(...);
 } catch (err) {
   if (err instanceof FileForgeError) {
-    console.log(err.statusCode); 
+    console.log(err.statusCode);
     console.log(err.message);
-    console.log(err.body); 
+    console.log(err.body);
   }
 }
 ```
@@ -63,11 +61,11 @@ than the configured retry limit (default: 2).
 
 A request is deemed retriable when any of the following HTTP status codes is returned:
 
-- [408](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) (Timeout)
-- [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) (Too Many Requests)
-- [5XX](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) (Internal Server Errors)
-  
-Use the `maxRetries` request option to configure this behavior. 
+-   [408](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) (Timeout)
+-   [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) (Too Many Requests)
+-   [5XX](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) (Internal Server Errors)
+
+Use the `maxRetries` request option to configure this behavior.
 
 ```ts
 const response = await fileforge.generate(..., {
@@ -77,8 +75,8 @@ const response = await fileforge.generate(..., {
 
 ## Timeouts
 
-The SDK defaults to a 60 second timout. Use the `timeoutInSeconds` option to 
-configure this behavior. 
+The SDK defaults to a 60 second timout. Use the `timeoutInSeconds` option to
+configure this behavior.
 
 ```ts
 const response = await fileforge.generate(..., {
@@ -88,23 +86,23 @@ const response = await fileforge.generate(..., {
 
 ## Runtime compatiblity
 
-The SDK defaults to `node-fetch` but will use the global fetch client if present. The SDK 
-works in the following runtimes: 
+The SDK defaults to `node-fetch` but will use the global fetch client if present. The SDK
+works in the following runtimes:
 
 The following runtimes are supported:
 
-- Node.js 18+ 
-- Vercel 
-- Cloudflare Workers
-- Deno v1.25+
-- Bun 1.0+
-- React Native
+-   Node.js 18+
+-   Vercel
+-   Cloudflare Workers
+-   Deno v1.25+
+-   Bun 1.0+
+-   React Native
 
 ### Customizing Fetch client
 
-The SDK provides a way for you to customize the underlying HTTP client / Fetch function. If you're 
-running in an unsupported environment, this provides a way for you to break the glass and 
-ensure the SDK works. 
+The SDK provides a way for you to customize the underlying HTTP client / Fetch function. If you're
+running in an unsupported environment, this provides a way for you to break the glass and
+ensure the SDK works.
 
 ```ts
 import { FileForge } from 'fileforge';
@@ -117,16 +115,16 @@ const guesty = new FileForge({
 
 ## Beta status
 
-This SDK is in beta, and there may be breaking changes between versions without a major version update. 
-Therefore, we recommend pinning the package version to a specific version in your package.json file. 
-This way, you can install the same version each time without breaking changes unless you are 
+This SDK is in beta, and there may be breaking changes between versions without a major version update.
+Therefore, we recommend pinning the package version to a specific version in your package.json file.
+This way, you can install the same version each time without breaking changes unless you are
 intentionally looking for the latest version.
 
 ## Contributing
 
-While we value open-source contributions to this SDK, this library is generated programmatically. 
-Additions made directly to this library would have to be moved over to our generation code, 
-otherwise they would be overwritten upon the next generated release. Feel free to open a 
-PR as a proof of concept, but know that we will not be able to merge it as-is. 
+While we value open-source contributions to this SDK, this library is generated programmatically.
+Additions made directly to this library would have to be moved over to our generation code,
+otherwise they would be overwritten upon the next generated release. Feel free to open a
+PR as a proof of concept, but know that we will not be able to merge it as-is.
 
 We suggest [opening an issue](https://github.com/FlatFilers/flatfile-node/issues) first to discuss with us!
