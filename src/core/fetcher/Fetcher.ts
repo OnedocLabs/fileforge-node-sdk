@@ -66,39 +66,25 @@ async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse
             : args.url;
 
     let body: BodyInit | undefined = undefined;
-    const maybeStringifyBody = (body: any) => {
+    const maybeStringifyBody = async (body: any) => {
         if (body instanceof Uint8Array) {
             return body;
+        } else if (body instanceof FormData 
+            || body instanceof (await import("formdata-node")).FormData 
+            || body instanceof (await import("form-data")).default)  { 
+            return body as any;
         } else {
             return JSON.stringify(body);
         }
     };
 
-    if (RUNTIME.type === "node") {
-        if (args.body instanceof (await import("formdata-node")).FormData) {
-            // @ts-expect-error
-            body = args.body;
-        } else {
-            body = maybeStringifyBody(args.body);
-        }
-    } else {
-        if (args.body instanceof (await import("form-data")).default) {
-            // @ts-expect-error
-            body = args.body;
-        } else {
-            body = maybeStringifyBody(args.body);
-        }
-    }
+    body = await maybeStringifyBody(args.body);
 
     // In Node.js environments, the SDK always uses`node-fetch`.
     // If not in Node.js the SDK uses global fetch if available,
     // and falls back to node-fetch.
     const fetchFn =
-        RUNTIME.type === "node"
-            ? // `.default` is required due to this issue:
-              // https://github.com/node-fetch/node-fetch/issues/450#issuecomment-387045223
-              ((await import("node-fetch")).default as any)
-            : typeof fetch == "function"
+        typeof fetch == "function"
             ? fetch
             : ((await import("node-fetch")).default as any);
 
@@ -138,6 +124,8 @@ async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse
                 break;
             }
         }
+
+        console.log(response.body);
 
         let body: unknown;
         if (response.body != null && args.responseType === "blob") {

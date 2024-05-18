@@ -1,6 +1,19 @@
 import stream from "stream";
+import * as core from "../src/core";
 import { FileForgeClient } from "../src";
 import fs from "fs";
+import { writeFile } from "fs/promises";
+
+const HTML = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>My First Web Page</title>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+  </body>
+</html>
+`;
 
 /**
  * This is a custom test file, if you wish to add more tests
@@ -12,44 +25,25 @@ import fs from "fs";
  */
 describe("test", () => {
     it("should generate a PDF", async () => {
-        const apiKeySupplier = async () => "ebec0c4c-214f-4796-afd2-b5c9b12281b6"; // Replace with your actual API key supplier
-        const environmentSupplier = async () => "https://api.fileforge.com"; // Replace with your actual environment endpoint
-
-        const client = new FileForgeClient({
-            apiKey: apiKeySupplier,
-            environment: environmentSupplier,
+        const blob = new Blob([HTML], {
+            type: "text/html",
         });
+        const htmlFile = new File([blob], "index.html", { type: "text/html" });
 
-        // Write HTML content to a file
-        const htmlContent = "<h1>Hello World!</h1>";
-        const blob = new Blob([htmlContent], { type: "text/html" });
-        const file = new File([blob], "index.html", { type: "text/html" });
-
-        const request = {
-            options: {
-                fileName: "test.pdf",
-                test: false,
-                host: false,
-            },
-        };
-
-        const pdfStream: stream.Readable = await client.generate([file], request);
-        console.log(pdfStream);
-        const pdfFilePath = "output.pdf";
-        const writeStream = fs.createWriteStream(pdfFilePath);
-
-        pdfStream.pipe(writeStream);
-
-        return new Promise((resolve, reject) => {
-            writeStream.on("finish", () => {
-                console.log("PDF generated and saved to", pdfFilePath);
-                resolve(true);
-            });
-
-            writeStream.on("error", (error) => {
-                console.error("Error generating PDF:", error);
-                reject(error);
-            });
+        const ff = new FileForgeClient({
+            apiKey: "480039ed-ccf0-48be-9103-6875d0559012"
         });
-    });
+        const pdf = await ff.generate(
+            [htmlFile], 
+            {
+                options: {}
+            }
+        );
+
+        const chunks: any[] = []
+        for await (let chunk of pdf) {
+            chunks.push(chunk)
+        }
+        await writeFile("output.pdf", Buffer.concat(chunks));
+    }, 10_000_000);
 });

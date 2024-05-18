@@ -1,6 +1,6 @@
 import { RUNTIME } from "../runtime";
 
-export function newFormData(): FormData {
+export function newFormData(): CrossRuntimeFormData {
     if (RUNTIME.type === "node") {
         return new NodeFormData();
     } else {
@@ -8,13 +8,13 @@ export function newFormData(): FormData {
     }
 }
 
-export declare namespace FormData {
+export declare namespace CrossRuntimeFormData {
     interface AppendOptions {
         contentType?: string;
     }
 }
 
-export abstract class FormData {
+export abstract class CrossRuntimeFormData {
     public abstract append(key: string, value: any, options?: { contentType?: string }): Promise<void>;
 
     /**
@@ -28,13 +28,11 @@ export abstract class FormData {
     public abstract getHeaders(): Promise<Record<string, string>>;
 }
 
-class NodeFormData implements FormData {
-    private encoder: any | undefined;
+class NodeFormData implements CrossRuntimeFormData {
     private fd: any | undefined;
 
-    public async initialize(): Promise<void> {
-        this.fd = new (await import("formdata-node")).FormData();
-        this.encoder = new (await import("form-data-encoder")).FormDataEncoder(this.fd);
+    public constructor() {
+        this.fd = new FormData();
     }
 
     public async append(
@@ -42,34 +40,23 @@ class NodeFormData implements FormData {
         value: any,
         options?: { contentType?: string | undefined } | undefined
     ): Promise<void> {
-        if (this.fd == null) {
-            await this.initialize();
-        }
-        if (options?.contentType == null) {
-            this.fd.append(key, value);
+        if (options?.contentType != null) {
+            this.fd.append(key, new Blob([value], { type: options?.contentType }));
         } else {
-            this.fd.append(key, new Blob([value], { type: options.contentType }));
+            this.fd.append(key, value);
         }
     }
-    
+
     public async getBody(): Promise<any> {
-        if (this.encoder == null) {
-            await this.initialize();
-        }
-        return (await import("node:stream")).Readable.from(this.encoder);
+        return this.fd;
     }
 
     public async getHeaders(): Promise<Record<string, string>> {
-        if (this.encoder == null) {
-            await this.initialize();
-        }
-        return {
-            "Content-Length": this.encoder.length,
-        };
+        return {};
     }
 }
 
-class WebFormData implements FormData {
+class WebFormData implements CrossRuntimeFormData {
     private fd: any;
 
     public async initialize(): Promise<void> {

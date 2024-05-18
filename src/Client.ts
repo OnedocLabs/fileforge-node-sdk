@@ -45,12 +45,7 @@ export class FileForgeClient {
             allowUnrecognizedEnumValues: false,
             breadcrumbsPrefix: [""],
         });
-        console.log(options);
-        await _request.append(
-            "options",
-            JSON.stringify(options),
-            { contentType: "application/json" }
-        );
+        await _request.append("options", new Blob([JSON.stringify(options)], { type: "application/json" }));
         for (const _file of files) {
             await _request.append("files", _file);
         }
@@ -74,9 +69,7 @@ export class FileForgeClient {
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
-        console.log("_response", JSON.stringify(_response))
         if (_response.ok) {
-            console.log("_response.body", _response.body);
             return _response.body;
         }
 
