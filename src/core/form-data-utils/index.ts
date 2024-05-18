@@ -1,1 +1,1 @@
-export * from "./FormDataWrapper";
+export { newFormData } from "./FormData";

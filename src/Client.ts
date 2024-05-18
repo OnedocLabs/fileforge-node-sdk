@@ -38,13 +38,22 @@ export class FileForgeClient {
         request: FileForge.GenerateRequest,
         requestOptions?: FileForgeClient.RequestOptions
     ): Promise<stream.Readable> {
-        const _request = new core.FormDataWrapper();
-        await _request.append("options", JSON.stringify(request.options), { contentType: "application/json"});
+        const _request = core.newFormData();
+        const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
+            unrecognizedObjectKeys: "passthrough",
+            allowUnrecognizedUnionMembers: false,
+            allowUnrecognizedEnumValues: false,
+            breadcrumbsPrefix: [""],
+        });
+        console.log(options);
+        await _request.append(
+            "options",
+            JSON.stringify(options),
+            { contentType: "application/json" }
+        );
         for (const _file of files) {
             await _request.append("files", _file);
         }
-
-        const _maybeEncodedRequest = _request.getRequest();
         const _response = await core.fetcher<stream.Readable>({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.FileForgeEnvironment.Default,
@@ -58,54 +67,24 @@ export class FileForgeClient {
                 "X-Fern-SDK-Version": "0.0.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...(await _maybeEncodedRequest.getHeaders()),
+                ...(await _request.getHeaders()),
             },
-            body: await _maybeEncodedRequest.getBody(),
+            body: await _request.getBody(),
             responseType: "streaming",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
+        console.log("_response", JSON.stringify(_response))
         if (_response.ok) {
+            console.log("_response.body", _response.body);
             return _response.body;
         }
 
         if (_response.error.reason === "status-code") {
-            switch (_response.error.statusCode) {
-                case 400:
-                    throw new FileForge.BadRequestError(
-                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
-                            unrecognizedObjectKeys: "passthrough",
-                            allowUnrecognizedUnionMembers: true,
-                            allowUnrecognizedEnumValues: true,
-                            breadcrumbsPrefix: ["response"],
-                        })
-                    );
-                case 401:
-                    throw new FileForge.UnauthorizedError(
-                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
-                            unrecognizedObjectKeys: "passthrough",
-                            allowUnrecognizedUnionMembers: true,
-                            allowUnrecognizedEnumValues: true,
-                            breadcrumbsPrefix: ["response"],
-                        })
-                    );
-                case 500:
-                    throw new FileForge.InternalServerError(_response.error.body);
-                case 502:
-                    throw new FileForge.BadGatewayError(
-                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
-                            unrecognizedObjectKeys: "passthrough",
-                            allowUnrecognizedUnionMembers: true,
-                            allowUnrecognizedEnumValues: true,
-                            breadcrumbsPrefix: ["response"],
-                        })
-                    );
-                default:
-                    throw new errors.FileForgeError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.body,
-                    });
-            }
+            throw new errors.FileForgeError({
+                statusCode: _response.error.statusCode,
+                body: _response.error.body,
+            });
         }
 
         switch (_response.error.reason) {
