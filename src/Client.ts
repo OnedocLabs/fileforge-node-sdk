@@ -21,6 +21,11 @@ export declare namespace FileForgeClient {
         timeoutInSeconds?: number;
         maxRetries?: number;
     }
+
+    interface Response{
+        file?: string;
+        url?:string;
+    }
 }
 
 export class FileForgeClient {
@@ -37,7 +42,7 @@ export class FileForgeClient {
         files: File[] | fs.ReadStream[],
         request: FileForge.GenerateRequest,
         requestOptions?: FileForgeClient.RequestOptions
-    ): Promise<Buffer>{
+    ): Promise<FileForgeClient.Response>{
         const _request = core.newFormData();
         const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
             unrecognizedObjectKeys: "passthrough",
@@ -69,6 +74,7 @@ export class FileForgeClient {
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
+
         if (_response.ok) {
                 const chunks: any[] = [];
     
@@ -77,8 +83,12 @@ export class FileForgeClient {
                 }
                 
                 const buffer: Buffer = Buffer.concat(chunks);
-    
-                return buffer;
+
+                if (request.options?.host !== true){
+                    return {"file": buffer.toString()};
+                }else{
+                    return JSON.parse(buffer.toString())
+                }
         }
 
         if (_response.error.reason === "status-code") {

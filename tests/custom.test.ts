@@ -46,14 +46,14 @@ describe("test", () => {
             apiKey: FILEFORGE_API_KEY
         });
 
-        const pdf = await ff.generate(
+        const pdf:FileForgeClient.Response = await ff.generate(
             [htmlFile, cssFile], 
             {
                 options: {}
             }
         );
 
-        await writeFile("output.pdf", pdf);
+        await writeFile("output.pdf", pdf.file!);
     }, 10_000_000);
 
 
@@ -71,7 +71,7 @@ describe("test", () => {
             apiKey: FILEFORGE_API_KEY
         });
 
-        const pdf:Buffer = await ff.generate(
+        const pdf:FileForgeClient.Response = await ff.generate(
             [htmlFile, cssFile], 
             {
                 options: {
@@ -80,13 +80,7 @@ describe("test", () => {
             }
         );
   
-        const chunks: any[] = [];
-        for await (let chunk of pdf) {
-            chunks.push(chunk);
-        }
-        const result = JSON.parse(pdf.toString());
-
-        expect(result.url).not.toBeNull();
+        expect(pdf.url).not.toBeNull();
 
     }, 10_000_000);
 
@@ -104,7 +98,7 @@ describe("test", () => {
             apiKey: "blabla_invalid_key"
         });
         try {
-            const pdf:Buffer = await ff.generate(
+            const pdf = await ff.generate(
                 [htmlFile, cssFile], 
                 {
                     options: {
@@ -116,10 +110,7 @@ describe("test", () => {
         }catch(e){
                 expect(e).not.toBeNull();
                 if (e instanceof error.FileForgeError) {
-                    console.log(`Error status code: ${e.statusCode}`);
-                    console.log(`Error body: ${e.body}`);
                     expect(e.statusCode).toBe(401);
-
                 } 
         }
 
