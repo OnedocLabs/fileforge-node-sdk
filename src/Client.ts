@@ -37,7 +37,7 @@ export class FileForgeClient {
         files: File[] | fs.ReadStream[],
         request: FileForge.GenerateRequest,
         requestOptions?: FileForgeClient.RequestOptions
-    ): Promise<stream.Readable> {
+    ): Promise<Buffer>{
         const _request = core.newFormData();
         const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
             unrecognizedObjectKeys: "passthrough",
@@ -70,7 +70,15 @@ export class FileForgeClient {
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body;
+                const chunks: any[] = [];
+    
+                for await (let chunk of _response.body) {
+                    chunks.push(chunk);
+                }
+                
+                const buffer: Buffer = Buffer.concat(chunks);
+    
+                return buffer;
         }
 
         if (_response.error.reason === "status-code") {

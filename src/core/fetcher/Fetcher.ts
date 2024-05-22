@@ -125,8 +125,6 @@ async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse
             }
         }
 
-        console.log(response.body);
-
         let body: unknown;
         if (response.body != null && args.responseType === "blob") {
             body = await response.blob();
