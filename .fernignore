@@ -1,6 +1,5 @@
 # Specify files that shouldn't be modified by Fern
 
-src/Client.ts
 src/core/form-data-utils/FormDataWrapper.ts
 src/core/form-data-utils/index.ts
 src/core/index.ts
