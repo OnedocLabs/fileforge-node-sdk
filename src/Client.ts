@@ -21,6 +21,11 @@ export declare namespace FileForgeClient {
         timeoutInSeconds?: number;
         maxRetries?: number;
     }
+
+    interface Response{
+        file?: string;
+        url?:string;
+    }
 }
 
 export class FileForgeClient {
@@ -37,7 +42,7 @@ export class FileForgeClient {
         files: File[] | fs.ReadStream[],
         request: FileForge.GenerateRequest,
         requestOptions?: FileForgeClient.RequestOptions
-    ): Promise<stream.Readable> {
+    ): Promise<FileForgeClient.Response>{
         const _request = core.newFormData();
         const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
             unrecognizedObjectKeys: "passthrough",
@@ -45,12 +50,7 @@ export class FileForgeClient {
             allowUnrecognizedEnumValues: false,
             breadcrumbsPrefix: [""],
         });
-        console.log(options);
-        await _request.append(
-            "options",
-            JSON.stringify(options),
-            { contentType: "application/json" }
-        );
+        await _request.append("options", new Blob([JSON.stringify(options)], { type: "application/json" }));
         for (const _file of files) {
             await _request.append("files", _file);
         }
@@ -74,10 +74,21 @@ export class FileForgeClient {
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
-        console.log("_response", JSON.stringify(_response))
+
         if (_response.ok) {
-            console.log("_response.body", _response.body);
-            return _response.body;
+                const chunks: any[] = [];
+    
+                for await (let chunk of _response.body) {
+                    chunks.push(chunk);
+                }
+                
+                const buffer: Buffer = Buffer.concat(chunks);
+
+                if (request.options?.host !== true){
+                    return {"file": buffer.toString()};
+                }else{
+                    return JSON.parse(buffer.toString())
+                }
         }
 
         if (_response.error.reason === "status-code") {

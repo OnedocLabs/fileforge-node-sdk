@@ -1,7 +1,28 @@
 import stream from "stream";
+import * as core from "../src/core";
 import { FileForgeClient } from "../src";
+import * as error from "../src/errors/index";
 import fs from "fs";
+import { writeFile } from "fs/promises";
 
+const FILEFORGE_API_KEY = process.env.FILEFORGE_API_KEY!;
+
+const HTML = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>My First Web Page</title>
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+  </body>
+</html>
+`;
+
+const CSS =`body{
+    background-color: lightblue;
+}
+`;
 /**
  * This is a custom test file, if you wish to add more tests
  * to your SDK.
@@ -11,45 +32,89 @@ import fs from "fs";
  * you will have tests automatically generated for you.
  */
 describe("test", () => {
-    it("should generate a PDF", async () => {
-        const apiKeySupplier = async () => "ebec0c4c-214f-4796-afd2-b5c9b12281b6"; // Replace with your actual API key supplier
-        const environmentSupplier = async () => "https://api.fileforge.com"; // Replace with your actual environment endpoint
+    it("should generate a PDF buffer", async () => {
+        const htmlBlob = new Blob([HTML], {
+            type: "text/html",
+        });
+        const cssBlob = new Blob([CSS], {
+            type: "text/css",
+        });
+        const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
+        const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
 
-        const client = new FileForgeClient({
-            apiKey: apiKeySupplier,
-            environment: environmentSupplier,
+        const ff = new FileForgeClient({
+            apiKey: FILEFORGE_API_KEY
         });
 
-        // Write HTML content to a file
-        const htmlContent = "<h1>Hello World!</h1>";
-        const blob = new Blob([htmlContent], { type: "text/html" });
-        const file = new File([blob], "index.html", { type: "text/html" });
+        const pdf:FileForgeClient.Response = await ff.generate(
+            [htmlFile, cssFile], 
+            {
+                options: {}
+            }
+        );
 
-        const request = {
-            options: {
-                fileName: "test.pdf",
-                test: false,
-                host: false,
-            },
-        };
+        await writeFile("output.pdf", pdf.file!);
+    }, 10_000_000);
 
-        const pdfStream: stream.Readable = await client.generate([file], request);
-        console.log(pdfStream);
-        const pdfFilePath = "output.pdf";
-        const writeStream = fs.createWriteStream(pdfFilePath);
 
-        pdfStream.pipe(writeStream);
-
-        return new Promise((resolve, reject) => {
-            writeStream.on("finish", () => {
-                console.log("PDF generated and saved to", pdfFilePath);
-                resolve(true);
-            });
-
-            writeStream.on("error", (error) => {
-                console.error("Error generating PDF:", error);
-                reject(error);
-            });
+    it("should generate a PDF link", async () => {
+        const htmlBlob = new Blob([HTML], {
+            type: "text/html",
         });
-    });
+        const cssBlob = new Blob([CSS], {
+            type: "text/css",
+        });
+        const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
+        const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
+
+        const ff = new FileForgeClient({
+            apiKey: FILEFORGE_API_KEY
+        });
+
+        const pdf:FileForgeClient.Response = await ff.generate(
+            [htmlFile, cssFile], 
+            {
+                options: {
+                    host: true,
+                }
+            }
+        );
+  
+        expect(pdf.url).not.toBeNull();
+
+    }, 10_000_000);
+
+    it("should fail because of invalid api key", async () => {
+        const htmlBlob = new Blob([HTML], {
+            type: "text/html",
+        });
+        const cssBlob = new Blob([CSS], {
+            type: "text/css",
+        });
+        const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
+        const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
+
+        const ff = new FileForgeClient({
+            apiKey: "blabla_invalid_key"
+        });
+        try {
+            const pdf = await ff.generate(
+                [htmlFile, cssFile], 
+                {
+                    options: {
+                        host: true,
+                    }
+                }
+            );
+     
+        }catch(e){
+                expect(e).not.toBeNull();
+                if (e instanceof error.FileForgeError) {
+                    expect(e.statusCode).toBe(401);
+                } 
+        }
+
+    }, 10_000_000);
+
+
 });
