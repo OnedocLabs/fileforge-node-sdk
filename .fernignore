@@ -1,6 +1,6 @@
 # Specify files that shouldn't be modified by Fern
 
-src/core/helper.ts
+src/core/Helper.ts
 src/core/fetcher/Fetcher.ts
 src/core/form-data-utils/FormData.ts
 src/core/form-data-utils/index.ts
