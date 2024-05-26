@@ -20,6 +20,8 @@ export declare namespace FileForgeClient {
     interface RequestOptions {
         timeoutInSeconds?: number;
         maxRetries?: number;
+        abortSignal?: AbortSignal;
+
     }
 
 }
@@ -81,6 +83,98 @@ export class FileForgeClient {
                 statusCode: _response.error.statusCode,
                 body: _response.error.body,
             });
+        }
+
+        switch (_response.error.reason) {
+            case "non-json":
+                throw new errors.FileForgeError({
+                    statusCode: _response.error.statusCode,
+                    body: _response.error.rawBody,
+                });
+            case "timeout":
+                throw new errors.FileForgeTimeoutError();
+            case "unknown":
+                throw new errors.FileForgeError({
+                    message: _response.error.errorMessage,
+                });
+        }
+    }
+
+    /**
+     * @throws {@link Fileforge.BadRequestError}
+     * @throws {@link Fileforge.UnauthorizedError}
+     * @throws {@link Fileforge.InternalServerError}
+     */
+    public async merge(
+        files: File[] | fs.ReadStream[],
+        request: FileForge.MergeRequest,
+        requestOptions?: FileForgeClient.RequestOptions
+    ): Promise<any> {
+        const _request =  core.newFormData();
+        const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
+            unrecognizedObjectKeys: "passthrough",
+            allowUnrecognizedUnionMembers: false,
+            allowUnrecognizedEnumValues: false,
+            breadcrumbsPrefix: [""],
+        });
+        await _request.append("options", new Blob([JSON.stringify(options)], { type: "application/json" }));
+        for (const _file of files) {
+            await _request.append("files", _file);
+        }
+
+        const _response = await core.fetcher<stream.Readable>({
+            url: urlJoin(
+                (await core.Supplier.get(this._options.environment)) ?? environments.FileForgeEnvironment.Default,
+                "pdf/merge/"
+            ),
+            method: "POST",
+            headers: {
+                Authorization: await core.Supplier.get(this._options.apiKey),
+                "X-API-Key": await core.Supplier.get(this._options.apiKey),
+                "X-Fern-Language": "JavaScript",
+                "X-Fern-SDK-Name": "fileforge",
+                "X-Fern-SDK-Version": "0.0.12",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...(await _request.getHeaders()),
+            },
+            body: await _request.getBody(),
+            responseType: "streaming",
+            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+            maxRetries: requestOptions?.maxRetries,
+        });
+        if (_response.ok) {
+            return _response.body;
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new FileForge.BadRequestError(
+                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
+                            unrecognizedObjectKeys: "passthrough",
+                            allowUnrecognizedUnionMembers: true,
+                            allowUnrecognizedEnumValues: true,
+                            breadcrumbsPrefix: ["response"],
+                        })
+                    );
+                case 401:
+                    throw new FileForge.UnauthorizedError(
+                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
+                            unrecognizedObjectKeys: "passthrough",
+                            allowUnrecognizedUnionMembers: true,
+                            allowUnrecognizedEnumValues: true,
+                            breadcrumbsPrefix: ["response"],
+                        })
+                    );
+                case 500:
+                    throw new FileForge.InternalServerError(_response.error.body);
+                default:
+                    throw new errors.FileForgeError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                    });
+            }
         }
 
         switch (_response.error.reason) {

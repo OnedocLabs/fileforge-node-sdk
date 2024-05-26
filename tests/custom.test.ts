@@ -175,5 +175,32 @@ describe("test", () => {
         expect(pdf.url).not.toBeNull();
 }, 10_000_000);
 
+    it("should merge two PDFs", async () => {
+        const PDF1 = await fs.promises.readFile("./output.pdf");
+        const PDF2 = await fs.promises.readFile("./output_helper.pdf");
+
+        const pdfBlob1= new Blob([PDF1], {
+            type: "application/pdf",
+        });
+        const pdfBlob2 = new Blob([PDF2], {
+            type: "application/pdf",
+        });
+        const file1 = new File([pdfBlob1], "pdf1.pdf", { type: "application/pdf" });
+        const file2 = new File([pdfBlob2], "pdf2.pdf", { type: "application/pdf" });
+
+        const ff = new FileForgeClient({
+            apiKey: FILEFORGE_API_KEY
+        });
+
+        const pdf = await ff.merge(
+            [file1, file2],
+            {   
+                options: {},
+            }            
+        );       
+
+        await writeFile("output_merged.pdf", pdf.file);
+        expect(pdf.file).not.toBeNull();
+}, 10_000_000);
 
 });
