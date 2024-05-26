@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as FileForge from "../../api/index";
+import * as Fileforge from "../../api/index";
 import * as core from "../../core";
 
 export const ConvertDocxRequestOptions: core.serialization.ObjectSchema<
     serializers.ConvertDocxRequestOptions.Raw,
-    FileForge.ConvertDocxRequestOptions
+    Fileforge.ConvertDocxRequestOptions
 > = core.serialization.object({
     templateLiterals: core.serialization.record(core.serialization.string(), core.serialization.string()).optional(),
 });
