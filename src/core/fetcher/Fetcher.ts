@@ -42,6 +42,29 @@ export declare namespace Fetcher {
     }
 }
 
+async function* readableStreamAsyncIterator(stream: ReadableStream<Uint8Array>) {
+    const reader = stream.getReader();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        yield value;
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+function isStringifiedJSON(str: string): boolean {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  
+
 const INITIAL_RETRY_DELAY = 1;
 const MAX_RETRY_DELAY = 60;
 const DEFAULT_MAX_RETRIES = 2;
@@ -127,10 +150,32 @@ async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse
 
         let body: unknown;
         if (response.body != null && args.responseType === "blob") {
+            console.log("BLOB")
             body = await response.blob();
         } else if (response.body != null && args.responseType === "streaming") {
-            body = response.body;
+            
+            const chunks: any[] = [];
+    
+            for await (let chunk of readableStreamAsyncIterator(response.body)) {
+                chunks.push(chunk);
+            }
+                
+            const buffer: Buffer = Buffer.concat(chunks);
+            const bufferString = buffer.toString();
+
+            if (bufferString.includes("%%EOF")){
+                body = {"file":buffer};
+
+            }else if (isStringifiedJSON(bufferString)){
+                body = JSON.parse(bufferString)
+
+            }else{
+                body = bufferString
+
+            }
+
         } else if (response.body != null && args.responseType === "text") {
+            console.log("TEXT")
             body = await response.text();
         } else {
             const text = await response.text();

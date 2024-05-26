@@ -1,6 +1,7 @@
 import stream from "stream";
 import * as core from "../src/core";
 import { FileForgeClient } from "../src";
+import { generate_from_html } from "../src/Helper";
 import * as error from "../src/errors/index";
 import fs from "fs";
 import { writeFile } from "fs/promises";
@@ -53,15 +54,8 @@ describe("test", () => {
             }
         );       
         
-        const chunks: any[] = [];
-    
-        for await (let chunk of pdf) {
-            chunks.push(chunk);
-        }
-                
-        const buffer: Buffer = Buffer.concat(chunks);
 
-        await writeFile("output.pdf", buffer.toString()!);
+        await writeFile("output.pdf", pdf.file);
     }, 10_000_000);
 
 
@@ -87,15 +81,9 @@ describe("test", () => {
                 }
             }
         );
-        const chunks: any[] = [];
-    
-        for await (let chunk of pdf) {
-            chunks.push(chunk);
-        }
-                
-        const buffer: Buffer = Buffer.concat(chunks);
 
-        expect(JSON.parse(buffer.toString()).url).not.toBeNull();
+
+        expect(pdf.url).not.toBeNull();
 
     }, 10_000_000);
 
@@ -130,6 +118,62 @@ describe("test", () => {
         }
 
     }, 10_000_000);
+
+
+    it("should generate a PDF buffer from helper", async () => {
+        const htmlBlob = new Blob([HTML], {
+            type: "text/html",
+        });
+        const cssBlob = new Blob([CSS], {
+            type: "text/css",
+        });
+        const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
+        const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
+
+        const ff = new FileForgeClient({
+            apiKey: FILEFORGE_API_KEY
+        });
+
+        const pdf = await generate_from_html(
+            ff,
+            {
+                html:HTML,
+                fileName:"test",
+                host:false,
+                test:false
+            }
+            
+        );       
+        
+        await writeFile("output_helper.pdf", pdf.file!);
+    }, 10_000_000);
+
+    it("should generate a PDF url from helper", async () => {
+        const htmlBlob = new Blob([HTML], {
+            type: "text/html",
+        });
+        const cssBlob = new Blob([CSS], {
+            type: "text/css",
+        });
+        const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
+        const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
+
+        const ff = new FileForgeClient({
+            apiKey: FILEFORGE_API_KEY
+        });
+
+        const pdf = await generate_from_html(
+            ff,
+            {
+                html:HTML,
+                fileName:"test",
+                host:true,
+            }
+            
+        );       
+        
+        expect(pdf.url).not.toBeNull();
+}, 10_000_000);
 
 
 });
