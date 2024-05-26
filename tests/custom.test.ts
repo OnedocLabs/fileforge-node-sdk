@@ -46,14 +46,22 @@ describe("test", () => {
             apiKey: FILEFORGE_API_KEY
         });
 
-        const pdf:FileForgeClient.Response = await ff.generate(
+        const pdf = await ff.generate(
             [htmlFile, cssFile], 
             {
                 options: {}
             }
-        );
+        );       
+        
+        const chunks: any[] = [];
+    
+        for await (let chunk of pdf) {
+            chunks.push(chunk);
+        }
+                
+        const buffer: Buffer = Buffer.concat(chunks);
 
-        await writeFile("output.pdf", pdf.file!);
+        await writeFile("output.pdf", buffer.toString()!);
     }, 10_000_000);
 
 
@@ -71,7 +79,7 @@ describe("test", () => {
             apiKey: FILEFORGE_API_KEY
         });
 
-        const pdf:FileForgeClient.Response = await ff.generate(
+        const pdf = await ff.generate(
             [htmlFile, cssFile], 
             {
                 options: {
@@ -79,8 +87,15 @@ describe("test", () => {
                 }
             }
         );
-  
-        expect(pdf.url).not.toBeNull();
+        const chunks: any[] = [];
+    
+        for await (let chunk of pdf) {
+            chunks.push(chunk);
+        }
+                
+        const buffer: Buffer = Buffer.concat(chunks);
+
+        expect(JSON.parse(buffer.toString()).url).not.toBeNull();
 
     }, 10_000_000);
 
