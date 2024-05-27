@@ -40,7 +40,13 @@ export class FileforgeClient {
         requestOptions?: FileforgeClient.RequestOptions
     ): Promise<stream.Readable> {
         const _request = new core.FormDataWrapper();
-        await _request.append("options", JSON.stringify(request.options));
+        const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
+            unrecognizedObjectKeys: "passthrough",
+            allowUnrecognizedUnionMembers: false,
+            allowUnrecognizedEnumValues: false,
+            breadcrumbsPrefix: [""],
+        });
+        await _request.append("options", new Blob([JSON.stringify(options)], { type: "application/json" }));
         for (const _file of files) {
             await _request.append("files", _file);
         }
@@ -73,24 +79,6 @@ export class FileforgeClient {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
-                case 400:
-                    throw new Fileforge.BadRequestError(
-                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
-                            unrecognizedObjectKeys: "passthrough",
-                            allowUnrecognizedUnionMembers: true,
-                            allowUnrecognizedEnumValues: true,
-                            breadcrumbsPrefix: ["response"],
-                        })
-                    );
-                case 401:
-                    throw new Fileforge.UnauthorizedError(
-                        await serializers.ErrorSchema.parseOrThrow(_response.error.body, {
-                            unrecognizedObjectKeys: "passthrough",
-                            allowUnrecognizedUnionMembers: true,
-                            allowUnrecognizedEnumValues: true,
-                            breadcrumbsPrefix: ["response"],
-                        })
-                    );
                 case 500:
                     throw new Fileforge.InternalServerError(_response.error.body);
                 case 502:
@@ -136,7 +124,13 @@ export class FileforgeClient {
         requestOptions?: FileforgeClient.RequestOptions
     ): Promise<stream.Readable> {
         const _request = new core.FormDataWrapper();
-        await _request.append("options", JSON.stringify(request.options));
+        const options = await serializers.MergeRequestOptions.jsonOrThrow(request.options, {
+            unrecognizedObjectKeys: "passthrough",
+            allowUnrecognizedUnionMembers: false,
+            allowUnrecognizedEnumValues: false,
+            breadcrumbsPrefix: [""],
+        });
+        await _request.append("options", new Blob([JSON.stringify(options)], { type: "application/json" }));
         for (const _file of files) {
             await _request.append("files", _file);
         }

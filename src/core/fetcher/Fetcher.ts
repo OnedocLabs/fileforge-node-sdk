@@ -94,14 +94,7 @@ async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse
     // In Node.js environments, the SDK always uses`node-fetch`.
     // If not in Node.js the SDK uses global fetch if available,
     // and falls back to node-fetch.
-    const fetchFn =
-        RUNTIME.type === "node"
-            ? // `.default` is required due to this issue:
-              // https://github.com/node-fetch/node-fetch/issues/450#issuecomment-387045223
-              ((await import("node-fetch")).default as any)
-            : typeof fetch == "function"
-            ? fetch
-            : ((await import("node-fetch")).default as any);
+    const fetchFn = typeof fetch == "function" ? fetch : ((await import("node-fetch")).default as any);
 
     const makeRequest = async (): Promise<Response> => {
         const signals: AbortSignal[] = [];

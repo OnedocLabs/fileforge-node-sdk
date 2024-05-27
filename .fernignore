@@ -1,3 +1,18 @@
 # Specify files that shouldn't be modified by Fern
 
 README.md
+
+## Support content type on form data
+src/core/form-data-utils
+src/Client.ts
+src/core/fetcher
+
+## Change response signature 
+src/wrapper
+src/index.ts
+
+# Helper
+src/generateFromHtml.ts
+
+## Tests
+tests/custom.test.ts
