@@ -53,7 +53,7 @@ export class FileforgeClient {
             await _request.append("files", _file);
         }
 
-        const _response = await core.fetcher<stream.Readable>({
+        const _response = await core.fetcher<ResponseObject | any>({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.FileforgeEnvironment.Default,
                 "pdf/generate/"
@@ -154,7 +154,7 @@ export class FileforgeClient {
             await _request.append("files", _file);
         }
 
-        const _response = await core.fetcher<stream.Readable>({
+        const _response = await core.fetcher<ResponseObject | any>({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.FileforgeEnvironment.Default,
                 "pdf/merge/"
@@ -164,8 +164,8 @@ export class FileforgeClient {
                 Authorization: await core.Supplier.get(this._options.apiKey),
                 "X-API-Key": await core.Supplier.get(this._options.apiKey),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "fileforge",
-                "X-Fern-SDK-Version": "0.0.12",
+                "X-Fern-SDK-Name": "@fileforge/client",
+                "X-Fern-SDK-Version": "0.0.13",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...(await _request.getHeaders()),
