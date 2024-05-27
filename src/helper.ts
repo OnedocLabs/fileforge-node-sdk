@@ -14,12 +14,12 @@ export interface Asset {
     path: string;
     content: string;
   }
-  export interface PathBuffer {
+export interface PathBuffer {
     path: string;
     content: Buffer;
   }
   
-type AssetOrPathBuffer = Asset | PathBuffer;
+export type AssetOrPathBuffer = Asset | PathBuffer;
   
 
 export interface DocumentInput {
