@@ -8,7 +8,7 @@
 export interface GenerateRequestOptions {
     /** Generate a test document instead of a production document. The generated document will contain a watermark. Defaults to true. */
     test?: boolean;
-    /** If enabled, the document will be hosted by FileForge and a presigned URL will be returned. */
+    /** If enabled, the document will be hosted by Fileforge and a presigned URL will be returned. */
     host?: boolean;
     /** If host is enabled, the expiration date of the presigned URL. Defaults to 7 days from now. Cannot exceed 7 days from now. */
     expiresAt?: Date;

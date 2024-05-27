@@ -1,10 +1,7 @@
-import stream from "stream";
-import * as core from "../src/core";
-import { FileForgeClient } from "../src";
+import { FileforgeClient } from "../src";
 import { generate_from_html, ResponseStream, ResponseURL } from "../src/helper";
 import * as error from "../src/errors/index";
 import fs from "fs";
-import { writeFile } from "fs/promises";
 
 const FILEFORGE_API_KEY = process.env.FILEFORGE_API_KEY!;
 
@@ -43,7 +40,7 @@ describe("test", () => {
         const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
         const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
 
-        const ff = new FileForgeClient({
+        const ff = new FileforgeClient({
             apiKey: FILEFORGE_API_KEY
         });
 
@@ -71,7 +68,7 @@ describe("test", () => {
         const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
         const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
 
-        const ff = new FileForgeClient({
+        const ff = new FileforgeClient({
             apiKey: FILEFORGE_API_KEY
         });
 
@@ -98,7 +95,7 @@ describe("test", () => {
         const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
         const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
 
-        const ff = new FileForgeClient({
+        const ff = new FileforgeClient({
             apiKey: "blabla_invalid_key"
         });
         try {
@@ -113,7 +110,7 @@ describe("test", () => {
      
         }catch(e){
                 expect(e).not.toBeNull();
-                if (e instanceof error.FileForgeError) {
+                if (e instanceof error.FileforgeError) {
                     expect(e.statusCode).toBe(401);
                 } 
         }
@@ -131,7 +128,7 @@ describe("test", () => {
         const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
         const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
 
-        const ff = new FileForgeClient({
+        const ff = new FileforgeClient({
             apiKey: FILEFORGE_API_KEY
         });
 
@@ -161,7 +158,7 @@ describe("test", () => {
         const htmlFile = new File([htmlBlob], "index.html", { type: "text/html" });
         const cssFile = new File([cssBlob], "style.css", { type: "text/css" });
 
-        const ff = new FileForgeClient({
+        const ff = new FileforgeClient({
             apiKey: FILEFORGE_API_KEY
         });
 
@@ -191,7 +188,7 @@ describe("test", () => {
         const file1 = new File([pdfBlob1], "pdf1.pdf", { type: "application/pdf" });
         const file2 = new File([pdfBlob2], "pdf2.pdf", { type: "application/pdf" });
 
-        const ff = new FileForgeClient({
+        const ff = new FileforgeClient({
             apiKey: FILEFORGE_API_KEY
         });
 
@@ -211,7 +208,7 @@ describe("test", () => {
 it("should generate from html snippet", async () => {
     try {
 
-        const client = new FileForgeClient({
+        const client = new FileforgeClient({
             apiKey: FILEFORGE_API_KEY
         });
         const documentInput = {
