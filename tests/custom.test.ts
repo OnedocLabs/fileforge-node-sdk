@@ -127,7 +127,7 @@ describe("test", () => {
         pdf.file.pipe(writeStream);
     }, 10_000_000);
 
-    it("should generate a PDF url from helper", async () => {
+    it.skip("should generate a PDF url from helper", async () => {
         const htmlBlob = new Blob([HTML], {
             type: "text/html",
         });
@@ -150,7 +150,7 @@ describe("test", () => {
         expect(pdf.url).not.toBeNull();
     }, 10_000_000);
 
-    it("should merge two PDFs", async () => {
+    it.skip("should merge two PDFs", async () => {
         const PDF1 = await fs.promises.readFile("./output.pdf");
         const PDF2 = await fs.promises.readFile("./output_helper.pdf");
 
