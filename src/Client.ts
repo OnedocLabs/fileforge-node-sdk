@@ -109,7 +109,7 @@ export class FileForgeClient {
         files: File[] | fs.ReadStream[],
         request: FileForge.MergeRequest,
         requestOptions?: FileForgeClient.RequestOptions
-    ): Promise<any> {
+    ): Promise<stream.Readable> {
         const _request =  core.newFormData();
         const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
             unrecognizedObjectKeys: "passthrough",
