@@ -4,7 +4,7 @@
 
 import * as errors from "../../errors/index";
 
-export class InternalServerError extends errors.FileforgeError {
+export class InternalServerError extends errors.FileForgeError {
     constructor(body?: unknown) {
         super({
             message: "InternalServerError",

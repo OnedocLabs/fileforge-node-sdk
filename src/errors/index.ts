@@ -1,2 +1,2 @@
-export { FileforgeError } from "./FileforgeError";
-export { FileforgeTimeoutError } from "./FileforgeTimeoutError";
+export { FileForgeError } from "./FileForgeError";
+export { FileForgeTimeoutError } from "./FileForgeTimeoutError";

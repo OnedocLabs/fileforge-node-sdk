@@ -3,10 +3,10 @@
  */
 
 import * as serializers from "../index";
-import * as Fileforge from "../../api/index";
+import * as FileForge from "../../api/index";
 import * as core from "../../core";
 
-export const ErrorSchema: core.serialization.ObjectSchema<serializers.ErrorSchema.Raw, Fileforge.ErrorSchema> =
+export const ErrorSchema: core.serialization.ObjectSchema<serializers.ErrorSchema.Raw, FileForge.ErrorSchema> =
     core.serialization.object({
         statusCode: core.serialization.number(),
         code: core.serialization.string(),

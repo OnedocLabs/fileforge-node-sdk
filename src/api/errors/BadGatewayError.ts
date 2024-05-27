@@ -3,10 +3,10 @@
  */
 
 import * as errors from "../../errors/index";
-import * as Fileforge from "../index";
+import * as FileForge from "../index";
 
-export class BadGatewayError extends errors.FileforgeError {
-    constructor(body: Fileforge.ErrorSchema) {
+export class BadGatewayError extends errors.FileForgeError {
+    constructor(body: FileForge.ErrorSchema) {
         super({
             message: "BadGatewayError",
             statusCode: 502,

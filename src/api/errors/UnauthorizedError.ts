@@ -3,10 +3,10 @@
  */
 
 import * as errors from "../../errors/index";
-import * as Fileforge from "../index";
+import * as FileForge from "../index";
 
-export class UnauthorizedError extends errors.FileforgeError {
-    constructor(body: Fileforge.ErrorSchema) {
+export class UnauthorizedError extends errors.FileForgeError {
+    constructor(body: FileForge.ErrorSchema) {
         super({
             message: "UnauthorizedError",
             statusCode: 401,

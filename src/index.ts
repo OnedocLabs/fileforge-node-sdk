@@ -1,4 +1,4 @@
-export * as Fileforge from "./api";
-export { FileforgeClient } from "./Client";
-export { FileforgeEnvironment } from "./environments";
-export { FileforgeError, FileforgeTimeoutError } from "./errors";
+export * as FileForge from "./api";
+export { FileForgeClient } from "./Client";
+export { FileForgeEnvironment } from "./environments";
+export { FileForgeError, FileForgeTimeoutError } from "./errors";

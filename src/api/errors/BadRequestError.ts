@@ -3,10 +3,10 @@
  */
 
 import * as errors from "../../errors/index";
-import * as Fileforge from "../index";
+import * as FileForge from "../index";
 
-export class BadRequestError extends errors.FileforgeError {
-    constructor(body: Fileforge.ErrorSchema) {
+export class BadRequestError extends errors.FileForgeError {
+    constructor(body: FileForge.ErrorSchema) {
         super({
             message: "BadRequestError",
             statusCode: 400,
