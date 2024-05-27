@@ -1,7 +1,7 @@
 import stream from "stream";
 import * as core from "../src/core";
 import { FileForgeClient } from "../src";
-import { generate_from_html } from "../src/Helper";
+import { generate_from_html, ResponseStream, ResponseURL } from "../src/Helper";
 import * as error from "../src/errors/index";
 import fs from "fs";
 import { writeFile } from "fs/promises";
@@ -52,18 +52,12 @@ describe("test", () => {
             {
                 options: {}
             }
-        );       
-
-        const chunks: any[] = [];
-    
-        for await (let chunk of pdf) {
-            chunks.push(chunk);
-        }
-            
-        const buffer: Buffer = Buffer.concat(chunks);
-        const bufferString = buffer.toString()
-
-        await writeFile("output.pdf", bufferString);
+        ) as ResponseStream;    
+        
+        // Write the PDF stream to a file
+        const writeStream = fs.createWriteStream('output.pdf');
+        pdf.file.pipe(writeStream);
+        
     }, 10_000_000);
 
 
@@ -88,11 +82,11 @@ describe("test", () => {
                     host: true,
                 }
             }
-        );
+        ) as ResponseURL;
 
         expect(pdf.url).not.toBeNull();
 
-    }, 10_000_000);
+     }, 10_000_000);
 
     it("should fail because of invalid api key", async () => {
         const htmlBlob = new Blob([HTML], {
@@ -150,18 +144,11 @@ describe("test", () => {
                 test:false
             }
             
-        );   
-        const chunks: any[] = [];
-    
-        for await (let chunk of pdf) {
-            chunks.push(chunk);
-        }
-            
-        const buffer: Buffer = Buffer.concat(chunks);
-        const bufferString = buffer.toString()
-    
-        
-        await writeFile("output_helper.pdf", bufferString);
+        ) as ResponseStream;   
+        // Write the PDF stream to a file
+        const writeStream = fs.createWriteStream('output_helper.pdf');
+        pdf.file.pipe(writeStream);
+
     }, 10_000_000);
 
     it("should generate a PDF url from helper", async () => {
@@ -186,7 +173,7 @@ describe("test", () => {
                 host:true,
             }
             
-        );       
+        ) as ResponseURL;       
         
         expect(pdf.url).not.toBeNull();
 }, 10_000_000);
@@ -215,16 +202,39 @@ describe("test", () => {
             }            
         );   
         
-        const chunks: any[] = [];
-    
-        for await (let chunk of pdf) {
-            chunks.push(chunk);
-        }
-            
-        const buffer: Buffer = Buffer.concat(chunks);
-        const bufferString = buffer.toString()
+        // Write the PDF stream to a file
+        const writeStream = fs.createWriteStream('output_merged.pdf');
+        pdf.file.pipe(writeStream);
 
-        await writeFile("output_merged.pdf", bufferString);
+}, 10_000_000);
+
+it("should generate from html snippet", async () => {
+    try {
+
+        const client = new FileForgeClient({
+            apiKey: FILEFORGE_API_KEY
+        });
+        const documentInput = {
+            html: HTML,
+            fileName: 'example',
+            test: false,
+            host: false,
+            expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
+            files: [
+                { path: '/style.css', content: CSS },
+            ],
+        };
+    
+        const response = await generate_from_html(client, documentInput) as ResponseStream;
+        
+        // Write the PDF stream to a file
+        const writeStream = fs.createWriteStream('outputSnippet.pdf');
+        response.file.pipe(writeStream);
+        console.log('PDF generated successfully.');
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+    }
+
 }, 10_000_000);
 
 });

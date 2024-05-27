@@ -148,25 +148,21 @@ async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse
 
             if (response.headers.get('content-type')!.includes("application/json")){
 
-                const chunks: any[] = [];
-    
-                for await (let chunk of readableStreamAsyncIterator(response.body)) {
-                    chunks.push(chunk);
-                }
-                    
-                const buffer: Buffer = Buffer.concat(chunks);
-                const bufferString = buffer.toString();
-
-                body = JSON.parse(bufferString)
+                body = await response.json()
 
             }else{
+                if(RUNTIME.type === "node"){
+                    const { Readable } = await import('node:stream');
+                    body = { "file":Readable.from(readableStreamAsyncIterator(response.body))}
 
-                body = response.body
+                }else{
+                    body = { "file":response.body }
+                }
 
             }
 
         } else if (response.body != null && args.responseType === "text") {
-            console.log("TEXT")
+
             body = await response.text();
         } else {
             const text = await response.text();

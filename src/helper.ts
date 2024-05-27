@@ -31,6 +31,15 @@ export interface DocumentInput {
     files?: AssetOrPathBuffer[];
   }
 
+export interface ResponseURL {
+    url: string;
+}
+
+export interface ResponseStream {
+    file: stream.Readable;
+}
+
+export type ResponseObject = ResponseStream | ResponseURL;
 
  /**
      * Generates a PDF document from web assets.
@@ -42,7 +51,7 @@ export interface DocumentInput {
 export async function generate_from_html(
     client: FileForgeClient,
     document: DocumentInput
-):Promise<any>{
+):Promise<ResponseObject>{
 
     const files: AssetOrPathBuffer[] = document.files ?? [];
     files.push({ path: "/index.html", content: document.html });
