@@ -200,7 +200,7 @@ describe("test", () => {
             {   
                 options: {},
             }            
-        );   
+        ) as ResponseStream;   
         
         // Write the PDF stream to a file
         const writeStream = fs.createWriteStream('output_merged.pdf');

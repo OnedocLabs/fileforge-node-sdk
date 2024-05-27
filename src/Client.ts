@@ -10,7 +10,7 @@ import * as stream from "stream";
 import urlJoin from "url-join";
 import * as errors from "./errors/index";
 import * as serializers from "./serialization/index";
-
+import { ResponseObject } from "./helper";
 export declare namespace FileForgeClient {
     interface Options {
         environment?: core.Supplier<environments.FileForgeEnvironment | string>;
@@ -40,7 +40,7 @@ export class FileForgeClient {
         files: File[] | fs.ReadStream[],
         request: FileForge.GenerateRequest,
         requestOptions?: FileForgeClient.RequestOptions
-    ): Promise<stream.Readable | any>{
+    ): Promise<ResponseObject | any>{
         const _request = core.newFormData();
         const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
             unrecognizedObjectKeys: "passthrough",
@@ -109,7 +109,7 @@ export class FileForgeClient {
         files: File[] | fs.ReadStream[],
         request: FileForge.MergeRequest,
         requestOptions?: FileForgeClient.RequestOptions
-    ): Promise<stream.Readable | any> {
+    ): Promise<ResponseObject | any> {
         const _request =  core.newFormData();
         const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
             unrecognizedObjectKeys: "passthrough",
