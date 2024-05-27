@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as FileForge from "../../api/index";
+import * as Fileforge from "../../api/index";
 import * as core from "../../core";
 
 export const GenerateRequestOptions: core.serialization.ObjectSchema<
     serializers.GenerateRequestOptions.Raw,
-    FileForge.GenerateRequestOptions
+    Fileforge.GenerateRequestOptions
 > = core.serialization.object({
     test: core.serialization.boolean().optional(),
     host: core.serialization.boolean().optional(),
