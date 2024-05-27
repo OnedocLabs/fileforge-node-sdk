@@ -16,3 +16,6 @@ src/generateFromHtml.ts
 
 ## Tests
 tests/custom.test.ts
+
+## Node v20
+.github/workflows/ci.yml
