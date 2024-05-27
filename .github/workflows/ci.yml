@@ -12,6 +12,8 @@ jobs:
 
       - name: Set up node
         uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
       - name: Compile
         run: yarn && yarn build
@@ -25,9 +27,13 @@ jobs:
 
       - name: Set up node
         uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-      - name: Compile
-        run: yarn && yarn test    
+      - name: Run tests
+        run: yarn && yarn test
+        env:
+          FILEFORGE_API_KEY: ${{ secrets.FILEFORGE_API_KEY }}    
 
   publish:
     needs: [ compile, test ]
@@ -40,6 +46,8 @@ jobs:
 
       - name: Set up node
         uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
       - name: Install dependencies
         run: yarn install
