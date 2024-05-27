@@ -40,7 +40,7 @@ export class FileForgeClient {
         files: File[] | fs.ReadStream[],
         request: FileForge.GenerateRequest,
         requestOptions?: FileForgeClient.RequestOptions
-    ): Promise<any>{
+    ): Promise<stream.Readable | any>{
         const _request = core.newFormData();
         const options = await serializers.GenerateRequestOptions.jsonOrThrow(request.options, {
             unrecognizedObjectKeys: "passthrough",

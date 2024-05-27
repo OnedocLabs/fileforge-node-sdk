@@ -53,9 +53,17 @@ describe("test", () => {
                 options: {}
             }
         );       
-        
 
-        await writeFile("output.pdf", pdf.file);
+        const chunks: any[] = [];
+    
+        for await (let chunk of pdf) {
+            chunks.push(chunk);
+        }
+            
+        const buffer: Buffer = Buffer.concat(chunks);
+        const bufferString = buffer.toString()
+
+        await writeFile("output.pdf", bufferString);
     }, 10_000_000);
 
 
@@ -81,7 +89,6 @@ describe("test", () => {
                 }
             }
         );
-
 
         expect(pdf.url).not.toBeNull();
 
@@ -143,9 +150,18 @@ describe("test", () => {
                 test:false
             }
             
-        );       
+        );   
+        const chunks: any[] = [];
+    
+        for await (let chunk of pdf) {
+            chunks.push(chunk);
+        }
+            
+        const buffer: Buffer = Buffer.concat(chunks);
+        const bufferString = buffer.toString()
+    
         
-        await writeFile("output_helper.pdf", pdf.file!);
+        await writeFile("output_helper.pdf", bufferString);
     }, 10_000_000);
 
     it("should generate a PDF url from helper", async () => {
@@ -197,10 +213,18 @@ describe("test", () => {
             {   
                 options: {},
             }            
-        );       
+        );   
+        
+        const chunks: any[] = [];
+    
+        for await (let chunk of pdf) {
+            chunks.push(chunk);
+        }
+            
+        const buffer: Buffer = Buffer.concat(chunks);
+        const bufferString = buffer.toString()
 
-        await writeFile("output_merged.pdf", pdf.file);
-        expect(pdf.file).not.toBeNull();
+        await writeFile("output_merged.pdf", bufferString);
 }, 10_000_000);
 
 });

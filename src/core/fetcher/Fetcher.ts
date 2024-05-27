@@ -55,15 +55,6 @@ async function* readableStreamAsyncIterator(stream: ReadableStream<Uint8Array>) 
     }
   }
 
-function isStringifiedJSON(str: string): boolean {
-    try {
-      JSON.parse(str);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-  
 
 const INITIAL_RETRY_DELAY = 1;
 const MAX_RETRY_DELAY = 60;
@@ -154,23 +145,23 @@ async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse
             body = await response.blob();
         } else if (response.body != null && args.responseType === "streaming") {
             
-            const chunks: any[] = [];
+
+            if (response.headers.get('content-type')!.includes("application/json")){
+
+                const chunks: any[] = [];
     
-            for await (let chunk of readableStreamAsyncIterator(response.body)) {
-                chunks.push(chunk);
-            }
-                
-            const buffer: Buffer = Buffer.concat(chunks);
-            const bufferString = buffer.toString();
+                for await (let chunk of readableStreamAsyncIterator(response.body)) {
+                    chunks.push(chunk);
+                }
+                    
+                const buffer: Buffer = Buffer.concat(chunks);
+                const bufferString = buffer.toString();
 
-            if (bufferString.includes("%%EOF")){
-                body = {"file":buffer};
-
-            }else if (isStringifiedJSON(bufferString)){
                 body = JSON.parse(bufferString)
 
             }else{
-                body = bufferString
+
+                body = response.body
 
             }
 
