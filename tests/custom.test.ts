@@ -1,7 +1,7 @@
 import stream from "stream";
 import * as core from "../src/core";
 import { FileForgeClient } from "../src";
-import { generate_from_html, ResponseStream, ResponseURL } from "../src/Helper";
+import { generate_from_html, ResponseStream, ResponseURL } from "../src/helper";
 import * as error from "../src/errors/index";
 import fs from "fs";
 import { writeFile } from "fs/promises";
