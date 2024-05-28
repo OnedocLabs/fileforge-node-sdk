@@ -3,12 +3,12 @@ import * as core from "./core";
 import urlJoin from "url-join";
 import * as errors from "./errors/index";
 import * as fs from "fs";
-import * as FileForge from "./api/index";
+import * as Fileforge from "./api/index";
 import * as stream from "stream";
 import { default as FormData } from "form-data";
 import * as serializers from "./serialization/index";
 import mime from "mime-types";
-import { FileForgeClient } from "Client";
+import { FileforgeClient } from "Client";
 
 export interface Asset {
     path: string;
@@ -43,13 +43,13 @@ export type ResponseObject = ResponseStream | ResponseURL;
 
  /**
      * Generates a PDF document from web assets.
-     * @throws {@link FileForge.BadRequestError}
-     * @throws {@link FileForge.UnauthorizedError}
-     * @throws {@link FileForge.InternalServerError}
-     * @throws {@link FileForge.BadGatewayError}
+     * @throws {@link Fileforge.BadRequestError}
+     * @throws {@link Fileforge.UnauthorizedError}
+     * @throws {@link Fileforge.InternalServerError}
+     * @throws {@link Fileforge.BadGatewayError}
      */
 export async function generate_from_html(
-    client: FileForgeClient,
+    client: FileforgeClient,
     document: DocumentInput
 ):Promise<ResponseObject>{
 
@@ -60,7 +60,7 @@ export async function generate_from_html(
     const save: boolean = document.host ?? false;
 
 
-    const optionsToUpload: FileForge.GenerateRequestOptions = { 
+    const optionsToUpload: Fileforge.GenerateRequestOptions = { 
       test: test,
       host: save,
       expiresAt: document.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000),

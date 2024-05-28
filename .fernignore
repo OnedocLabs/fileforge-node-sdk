@@ -5,6 +5,8 @@ src/core/helper.ts
 src/core/fetcher/Fetcher.ts
 src/core/form-data-utils/FormData.ts
 src/core/form-data-utils/index.ts
-src/core/index.ts
+
+tests/custom.test.ts
+
 README.md
-package.json
+

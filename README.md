@@ -1,8 +1,8 @@
-# FileForge TypeScript Library
+# Fileforge TypeScript Library
 
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://buildwithfern.com/)
 
-The FileForge TypeScript library provides convenient access to the FileForge API from JavaScript/TypeScript.
+The Fileforge TypeScript library provides convenient access to the Fileforge API from JavaScript/TypeScript.
 
 ## Documentation
 
@@ -19,10 +19,10 @@ yarn add fileforge
 ## Usage
 
 ```typescript
-import { FileForgeClient, FileForge } from "guesty";
+import { FileforgeClient, Fileforge } from "guesty";
 import * as fs from "fs";
 
-const fileforge = new FileForgeClient({
+const fileforge = new FileforgeClient({
     apiKey: "...",
 });
 
@@ -37,15 +37,15 @@ await fileforge.generate({
 ## Exception Handling
 
 When the API returns a non-success status code (4xx or 5xx response),
-a subclass of [FileForgeError](./src/errors/FileForgeError.ts) will be thrown:
+a subclass of [FileforgeError](./src/errors/FileforgeError.ts) will be thrown:
 
 ```ts
-import { FileForgeError } from 'fileforge';
+import { FileforgeError } from 'fileforge';
 
 try {
   await fileforge.generate(...);
 } catch (err) {
-  if (err instanceof FileForgeError) {
+  if (err instanceof FileforgeError) {
     console.log(err.statusCode);
     console.log(err.message);
     console.log(err.body);
@@ -105,9 +105,9 @@ running in an unsupported environment, this provides a way for you to break the 
 ensure the SDK works.
 
 ```ts
-import { FileForge } from 'fileforge';
+import { Fileforge } from 'fileforge';
 
-const guesty = new FileForge({
+const guesty = new Fileforge({
   apiKey: "...",
   fetcher: // provide your implementation here
 });
