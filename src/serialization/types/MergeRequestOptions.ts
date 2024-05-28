@@ -3,12 +3,12 @@
  */
 
 import * as serializers from "../index";
-import * as FileForge from "../../api/index";
+import * as Fileforge from "../../api/index";
 import * as core from "../../core";
 
 export const MergeRequestOptions: core.serialization.ObjectSchema<
     serializers.MergeRequestOptions.Raw,
-    FileForge.MergeRequestOptions
+    Fileforge.MergeRequestOptions
 > = core.serialization.object({});
 
 export declare namespace MergeRequestOptions {
