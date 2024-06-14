@@ -1,12 +1,13 @@
 # Fileforge TypeScript Library
 
+[![Version](https://img.shields.io/npm/v/@fileforge/client.svg)](https://www.npmjs.org/package/@fileforge/client)
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://buildwithfern.com/)
 
 The Fileforge TypeScript library provides convenient access to the Fileforge API from JavaScript/TypeScript.
 
 ## Documentation
 
-API reference documentation is available [here](https://fileforge.docs.buildwithfern.com/api-reference/pdf/converts-a-doc-or-docx-document-to-pdf).
+API reference documentation is available [here](https://docs.fileforge.com/api-reference/).
 
 ## Installation
 
